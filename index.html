@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Indian Trend Tracker</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    body { font-family: Arial, sans-serif; background: #0f172a; color: #fff; padding: 20px; }
+    h1 { text-align: center; color: #38bdf8; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-top: 20px; }
+    .card { background: #1e293b; padding: 15px; border-radius: 8px; border: 1px solid #334155; }
+    .price { color: #4ade80; font-weight: bold; }
+    .score { color: #facc15; }
+  </style>
+</head>
+<body>
+  <h1>🔥 Indian E-Commerce Trend Tracker</h1>
+  <div id="products" class="grid">Loading products...</div>
+
+  <script>
+    const SUPABASE_URL = "https://oqwgpklnyoyzdaqfkpxb.supabase.co";
+    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9xd2dwa2xueW95emRhcWZrcHhiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTAyMzQ0MjUsImV4cCI6MjEwNTgxMDQyNX0.ODPBxUWXeStDtaYj0-Tg5fz4sQUbqw9hUFl_2Z5g6cg"; 
+
+    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    async function loadProducts() {
+      const { data, error } = await supabase.from('trending_products').select('*');
+      const container = document.getElementById('products');
+      if (error) {
+        container.innerHTML = 'Error loading data: ' + error.message;
+        return;
+      }
+      container.innerHTML = data.map(item => `
+        <div class="card">
+          <h3>${item.name}</h3>
+          <p><strong>Platform:</strong> ${item.platform}</p>
+          <p><strong>Category:</strong> ${item.category}</p>
+          <p class="price">₹${item.price}</p>
+          <p class="score">Trend Score: ${item.trend_score}/100</p>
+          <p><strong>Supplier:</strong> ${item.supplier_source}</p>
+        </div>
+      `).join('');
+    }
+
+    loadProducts();
+  </script>
+</body>
+</html>
