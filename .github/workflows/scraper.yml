@@ -3,7 +3,7 @@ name: Indian Trend Tracker Scraper
 on:
   schedule:
     - cron: '0 */6 * * *' # Runs automatically every 6 hours
-  workflow_dispatch: # Allows you to run it manually anytime
+  workflow_dispatch: # Allows manual trigger anytime
 
 jobs:
   scrape:
