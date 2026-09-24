@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Indian Trend Tracker</title>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
   <style>
     body { font-family: Arial, sans-serif; background: #0f172a; color: #fff; padding: 20px; }
     h1 { text-align: center; color: #38bdf8; }
@@ -20,30 +20,40 @@
 
   <script>
     const SUPABASE_URL = "https://oqwgpklnyoyzdaqfkpxb.supabase.co";
+    // Replace with your exact Publishable or Anon key from Supabase
     const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9xd2dwa2xueW95emRhcWZrcHhiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTAyMzQ0MjUsImV4cCI6MjEwNTgxMDQyNX0.ODPBxUWXeStDtaYj0-Tg5fz4sQUbqw9hUFl_2Z5g6cg"; 
 
-    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
     async function loadProducts() {
-      const { data, error } = await supabase.from('trending_products').select('*');
       const container = document.getElementById('products');
-      if (error) {
-        container.innerHTML = 'Error loading data: ' + error.message;
-        return;
+      try {
+        const client = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        const { data, error } = await client.from('trending_products').select('*');
+        
+        if (error) {
+          container.innerHTML = '<p style="color:red;">Database Error: ' + error.message + '</p>';
+          return;
+        }
+
+        if (!data || data.length === 0) {
+          container.innerHTML = '<p>No products found in database.</p>';
+          return;
+        }
+
+        container.innerHTML = data.map(item => `
+          <div class="card">
+            <h3>${item.name || 'Unnamed Product'}</h3>
+            <p><strong>Platform:</strong> ${item.platform || 'N/A'}</p>
+            <p><strong>Category:</strong> ${item.category || 'N/A'}</p>
+            <p class="price">₹${item.price || 0}</p>
+            <p class="score">Trend Score: ${item.trend_score || 0}/100</p>
+          </div>
+        `).join('');
+      } catch (err) {
+        container.innerHTML = '<p style="color:red;">Script Error: ' + err.message + '</p>';
       }
-      container.innerHTML = data.map(item => `
-        <div class="card">
-          <h3>${item.name}</h3>
-          <p><strong>Platform:</strong> ${item.platform}</p>
-          <p><strong>Category:</strong> ${item.category}</p>
-          <p class="price">₹${item.price}</p>
-          <p class="score">Trend Score: ${item.trend_score}/100</p>
-          <p><strong>Supplier:</strong> ${item.supplier_source}</p>
-        </div>
-      `).join('');
     }
 
-    loadProducts();
+    window.onload = loadProducts;
   </script>
 </body>
 </html>
